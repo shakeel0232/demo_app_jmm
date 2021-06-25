@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "812319684105",
+    "project_id": "jmmdemo-636dc",
+    "storage_bucket": "jmmdemo-636dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:812319684105:android:43607a1ada5fcda6546ad8",
+        "android_client_info": {
+          "package_name": "com.jmm.demo.demo_app_jmm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "812319684105-phr2r9etf49qen0bmq8apidm06spb6ed.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBC89aCasmOrdux49soVk5-3EKIdPzTQjs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "812319684105-phr2r9etf49qen0bmq8apidm06spb6ed.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -22,8 +22,12 @@ if (flutterVersionName == null) {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-
+dependencies {
+    implementation 'com.android.support:multidex:2.0.1'
+//    implementation 'com.google.firebase:firebase-analytics'
+}
 android {
     compileSdkVersion 30
 
@@ -34,6 +38,7 @@ android {
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -48,3 +53,4 @@ android {
 flutter {
     source '../..'
 }
+apply plugin: 'com.google.gms.google-services'
