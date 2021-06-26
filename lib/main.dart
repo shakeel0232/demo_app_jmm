@@ -198,7 +198,16 @@ class _MyHomePageState extends State<MyHomePage> {
             // margin: EdgeInsets.all(10),
             // padding: EdgeInsets.all(10),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  new MaterialPageRoute(
+                    builder: (c) {
+                      return new 
+                    },
+                  ),
+                );
+
+              },
               child: Text('Place Order'),
               // style: TextStyle(fontWeight: FontWeight.bold),
             ),
