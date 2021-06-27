@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:demo_app_jmm/object/product.dart';
 import 'package:demo_app_jmm/order_confirmation.dart';
+import 'package:demo_app_jmm/order_history.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import "dart:collection";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -9,6 +12,8 @@ void main() async {
   runApp(MyApp());
 }
 
+double grandTotal = 0;
+List<Product> selectedList = [];
 
 class MyApp extends StatelessWidget {
   @override
@@ -29,17 +34,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   void initState() {
     super.initState();
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.list),
+        onPressed: () {
+          Navigator.of(context).push(
+            new MaterialPageRoute(
+              builder: (c) {
+                return new OrderHistory();
+              },
+            ),
+          );
+        },
+      ),
       body: Container(
         child: Wrap(
           children: [
@@ -52,17 +67,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   showProducts(context) {
-    double grandTotal = 0;
     return Container(
       margin: EdgeInsets.all(20),
-      height: MediaQuery
-          .of(context)
-          .size
-          .height,
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
       child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Products')
@@ -71,14 +79,9 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Container(
-                // alignment: Alignment.center,
                 child: ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    // physics: const NeverScrollableScrollPhysics(),
-                    /* gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                    ),*/
                     itemCount: snapshot.data!.docs.length,
                     // itemCount: snapshot.data.docs.length,
                     itemBuilder: (_, int index) {
@@ -91,19 +94,26 @@ class _MyHomePageState extends State<MyHomePage> {
                       return Card(
                           shadowColor: Colors.red,
                           child: Container(
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width,
+                            width: MediaQuery.of(context).size.width,
                             // margin: EdgeInsets.all(20),
                             child: ListTile(
                               onTap: () {
-                                index;
-
-
-                                setState(() {
-                                  grandTotal = 10;
-                                });
+                                Product p = new Product(
+                                    product_name: product_name,
+                                    product_price: product_price,
+                                    product_qty: product_qty,
+                                    product_url: product_url);
+                                // print(selectedList.contains(p));
+                                // List<Product> result =
+                                //     LinkedHashSet<Product>.from(selectedList)
+                                //         .toList();
+                                // print(result);
+                                if (!selectedList.contains(p)) {
+                                  selectedList.add(p);
+                                  setState(() {
+                                    grandTotal += double.parse(product_price);
+                                  });
+                                }
                               },
                               title: Container(
                                 // width: MediaQuery.of(context).size.width,
@@ -153,27 +163,20 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             color: Colors.redAccent,
             height: 1,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
           ),
           Container(
-
             margin: EdgeInsets.all(10),
             // padding: EdgeInsets.all(10),
             child: Text(
-              'Grand Total : SAR. 5000.00 ',
+              'Grand Total : SAR. ' + grandTotal.toString(),
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           Container(
             color: Colors.redAccent,
             height: 1,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
           ),
           Container(
             alignment: Alignment.centerRight,
@@ -181,16 +184,20 @@ class _MyHomePageState extends State<MyHomePage> {
             // padding: EdgeInsets.all(10),
             child: ElevatedButton(
               onPressed: () {
+                print(selectedList);
+                selectedList= selectedList.toSet().toList();
+                print(selectedList);
                 Navigator.of(context).push(
                   new MaterialPageRoute(
                     builder: (c) {
-                      return new OrderConfirmation();
+
+
+                      return new OrderConfirmation(selectedList);
                     },
                   ),
                 );
-
               },
-              child: Text('Place Order'),
+              child: Text('Next'),
               // style: TextStyle(fontWeight: FontWeight.bold),
             ),
           )
@@ -199,5 +206,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-
