@@ -21,7 +21,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blueGrey
+        ,
       ),
       home: MyHomePage(),
     );
@@ -58,6 +59,8 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Container(
         child: Wrap(
           children: [
+            Center(child: Text('Products',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 30),)),
+            // Center(child: Text('Select Products',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 10),)),
             Center(child: showProducts(context)),
           ],
         ),
@@ -101,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Product p = new Product(
                                     product_name: product_name,
                                     product_price: product_price,
-                                    product_qty: product_qty,
+                                    product_qty: 1.toString(),
                                     product_url: product_url);
                                 // print(selectedList.contains(p));
                                 // List<Product> result =

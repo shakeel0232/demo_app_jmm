@@ -1,18 +1,18 @@
 import 'package:accordion/accordion.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:demo_app_jmm/order_history_detail.dart';
 import 'package:flutter/material.dart';
 
 double grandTotal = 0;
 
-class OrderHistory extends StatefulWidget {
-  const OrderHistory({Key? key}) : super(key: key);
+class OrderHistoryDetail extends StatefulWidget {
+  String id;
 
   @override
   _OrderHistoryState createState() => _OrderHistoryState();
+  OrderHistoryDetail(this.id);
 }
 
-class _OrderHistoryState extends State<OrderHistory> {
+class _OrderHistoryState extends State<OrderHistoryDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,13 +20,14 @@ class _OrderHistoryState extends State<OrderHistory> {
       body: Container(
         child: Wrap(
           children: [
-            Center(child: Text('Orders',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 30),)),
+            Center(child: Text('Order Details',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 30),)),
             // Center(child: Text('Select Products',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 10),)),
-            Center(child: showGrandTotal(context)),
+            Center(child: showOrdersHistory(context)),
           ],
         ),
       ),
-      // body: showGrandTotal(context),
+
+      // bottomNavigationBar: showOrdersHistory(context),
     );
   }
 
@@ -40,7 +41,7 @@ class _OrderHistoryState extends State<OrderHistory> {
               .collection('Users')
               .doc('W9lxAPG5ZmPKvhAX2YLz')
               .collection('Orders')
-              .doc('RkZdmOVWG5FCKxauDanA')
+              .doc(widget.id)
               .collection('OrderProducts')
               // .orderBy("date", descending: false)
               .snapshots(),
@@ -139,7 +140,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                     // itemCount: snapshot.data.docs.length,
                     itemBuilder: (_, int index) {
                       var data = snapshot.data!.docs[index].data();
-                      var date = data['date'];
+                      var date = data['date'].toString();
                       var grand_total = data['grand_total'].toString();
                       var order_status = data['order_status'].toString();
                       return Card(
@@ -150,15 +151,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                               child: ListTile(
                                 onTap: () {
 
-                                  Navigator.of(context).push(
-                                    new MaterialPageRoute(
-                                      builder: (c) {
 
-
-                                        return new OrderHistoryDetail(snapshot.data!.docs[index].id);
-                                      },
-                                    ),
-                                  );
                                 },
                                 title: Container(
                                   // width: MediaQuery.of(context).size.width,
@@ -169,19 +162,9 @@ class _OrderHistoryState extends State<OrderHistory> {
                                         fontWeight: FontWeight.bold,
                                         color: Colors.deepOrange),
                                   ),
-                                ),                                subtitle: Container(
-                                  // width: MediaQuery.of(context).size.width,
-                                  child: Text(
-                                    date.toString(),
-                                    // DateTime.fromMillisecondsSinceEpoch(date ).toString(),
-                                    style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.deepOrange),
-                                  ),
                                 ),
                                 trailing: Text(
-                                  'Grand Total: '+grand_total,
+                                  grand_total,
                                   style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
