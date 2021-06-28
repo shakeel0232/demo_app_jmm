@@ -114,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   grandTotal += double.parse(product_price);
                                 });
                                 selectedList.add(p);
-Fluttertoast.showToast(msg: 'asd');
+// Fluttertoast.showToast(msg: 'asd');
   /*                              Fluttertoast.showToast(
                                     msg: product_name+' : Added',
                                     toastLength: Toast.LENGTH_SHORT,

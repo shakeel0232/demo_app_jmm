@@ -3,8 +3,8 @@ import 'package:demo_app_jmm/constant.dart';
 import 'package:demo_app_jmm/object/product.dart';
 import 'package:flutter/material.dart';
 
-// var qty = 1;
-int product_qty=0;
+var grandTotal = 0;
+int product_qty=1;
 
 class OrderConfirmation extends StatefulWidget {
   List<Product> list;
@@ -40,6 +40,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                     itemCount: data.length,
                     itemBuilder: (_, int index) {
                       int product_price = int.parse(data[index].product_price);
+                      // grandTotal= product_qty *product_price;
                       // product_qty = 1;
                       // product_qty = int.parse(data[index].product_qty);
                       return Card(
@@ -48,10 +49,11 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                             print(product_qty);
                             setState(() {
                               product_qty ++;
-                              // product_qty =10;
-                              // /product_qty +=  product_qty;
+                              // grandTotal= product_qty *product_price;
+                              // grandTotal+=grandTotal;
                             });
-                            print(product_qty);
+
+                            print(grandTotal);
                           },
                           title: Container(
                             // width: MediaQuery.of(context).size.width,
@@ -130,7 +132,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
             margin: EdgeInsets.all(10),
             // padding: EdgeInsets.all(10),
             child: Text(
-              'Grand Total : SAR. ' + "grandTotal".toString(),
+              'Grand Total : SAR. ' + grandTotal.toString(),
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -145,8 +147,8 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
             // padding: EdgeInsets.all(10),
             child: ElevatedButton(
 
-              onPressed: () async {
-               await  FirebaseFirestore.instance
+              onPressed: () async{
+                await  FirebaseFirestore.instance
                     .collection('Users')
                     .doc(appConstant().userId)
                     .collection('Orders')
@@ -155,21 +157,35 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                   'order_status': 'pending',
                   'date': FieldValue.serverTimestamp()
                 }).then((value) => docId =value.id);
-                
-               for(int i=0;i<widget.list.length;i++){
-                 FirebaseFirestore.instance
-                     .collection('Users')
-                     .doc(appConstant().userId)
-                     .collection('Orders').doc(docId).collection('OrderProducts')
-                     .add({
-                   'product_name': widget.list[i].product_name,
-                   'product_price': widget.list[i]. product_price,
-                   'product_qty': widget.list[i].product_qty,
-                   'product_url': widget.list[i].product_url
-                 });
-               }
 
-              },
+                for(int i=0;i<widget.list.length;i++){
+                  FirebaseFirestore.instance
+                      .collection('Users')
+                      .doc(appConstant().userId)
+                      .collection('Orders').doc(docId).collection('OrderProducts')
+                      .add({
+                    'product_name': widget.list[i].product_name,
+                    'product_price': widget.list[i]. product_price,
+                    'product_qty': widget.list[i].product_qty,
+                    'product_url': widget.list[i].product_url
+                  });
+                }
+
+                FirebaseFirestore _fireStoreDataBase = FirebaseFirestore.instance;
+                return _fireStoreDataBase
+                    .collection('Products')
+                    .doc(docId)
+                    .set({
+                  "product_qty": '-'+product_qty.toString(),
+                }).then((value)  {
+                  // print(value);
+                });
+
+               // addOrder(docId);
+               // addOrderItems(docId);
+               // deductQty(docId);
+               },
+              // },
               child: Text('Place Order'),
               // style: TextStyle(fontWeight: FontWeight.bold),
             ),
@@ -177,5 +193,45 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
         ],
       ),
     );
+  }
+
+
+  addOrder(docId)async{
+    await  FirebaseFirestore.instance
+        .collection('Users')
+        .doc(appConstant().userId)
+        .collection('Orders')
+        .add({
+      'grand_total': 1200,
+      'order_status': 'pending',
+      'date': FieldValue.serverTimestamp()
+    }).then((value) => docId =value.id);
+  }
+  addOrderItems(docId){
+    for(int i=0;i<widget.list.length;i++){
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(appConstant().userId)
+          .collection('Orders').doc(docId).collection('OrderProducts')
+          .add({
+        'product_name': widget.list[i].product_name,
+        'product_price': widget.list[i]. product_price,
+        'product_qty': widget.list[i].product_qty,
+        'product_url': widget.list[i].product_url
+      });
+    }
+  }
+  deductQty(docId){
+    FirebaseFirestore _fireStoreDataBase = FirebaseFirestore.instance;
+    return _fireStoreDataBase
+        .collection('Products')
+        .doc(docId)
+        .collection('product_qty')
+        .doc()
+        .set({
+      "playlist_id": '',
+    }).then((value)  {
+      // print(value);
+    });
   }
 }
