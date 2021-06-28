@@ -17,8 +17,15 @@ class OrderConfirmation extends StatefulWidget {
 
 class _OrderConfirmationState extends State<OrderConfirmation> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
+  @override
   Widget build(BuildContext context) {
     List<Product> data = widget.list;
+    // data.add(p);
     return Scaffold(
       appBar: AppBar(),
       body: Container(
@@ -46,19 +53,20 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                       return Card(
                         child: ListTile(
                           onTap: () {
-                            print(product_qty);
+                            // print(product_qty);
                             setState(() {
+                              // product_qty=product_price;
                               product_qty ++;
                               // grandTotal= product_qty *product_price;
                               // grandTotal+=grandTotal;
                             });
 
-                            print(grandTotal);
+                            // print(grandTotal);
                           },
                           title: Container(
                             // width: MediaQuery.of(context).size.width,
                             child: Text(
-                              data[index].product_name.toString(),
+                              data[index].product_name.toString()+' : '+(data[index].product_id.toString()),
                               style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -159,7 +167,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                 }).then((value) => docId =value.id);
 
                 for(int i=0;i<widget.list.length;i++){
-                  FirebaseFirestore.instance
+                  await  FirebaseFirestore.instance
                       .collection('Users')
                       .doc(appConstant().userId)
                       .collection('Orders').doc(docId).collection('OrderProducts')
@@ -169,17 +177,21 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                     'product_qty': widget.list[i].product_qty,
                     'product_url': widget.list[i].product_url
                   });
+                  FirebaseFirestore.instance
+                      .collection('Products')
+                      .doc(widget.list[i].product_id)
+                      .update({'product_qty':FieldValue.increment(-product_qty)});
                 }
+                // print('aas: '+widget.list[1].product_id);
+              /*  for(int j=0;j<widget.list.length;j++){
+                   FirebaseFirestore.instance
+                      .collection('Products')
+                      .doc(widget.list[j].product_id)
+                       .update({'product_qty':FieldValue.increment(-product_qty)});
 
-                FirebaseFirestore _fireStoreDataBase = FirebaseFirestore.instance;
-                return _fireStoreDataBase
-                    .collection('Products')
-                    .doc(docId)
-                    .set({
-                  "product_qty": '-'+product_qty.toString(),
-                }).then((value)  {
-                  // print(value);
-                });
+                }*/
+
+
 
                // addOrder(docId);
                // addOrderItems(docId);

@@ -92,11 +92,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     // itemCount: snapshot.data.docs.length,
                     itemBuilder: (_, int index) {
                       var data = snapshot.data!.docs[index].data();
+                      var product_id = snapshot.data!.docs[index].id;
+                      // print(product_id);
                       var product_name = data['product_name'].toString();
                       var product_price = data['product_price'].toString();
                       var product_qty = data['product_qty'].toString();
                       var product_url = data['product_url'].toString();
-                      var date = data['date'].toString();
+                      // var date = data['date'].toString();
                       return Card(
                           shadowColor: Colors.red,
                           child: Container(
@@ -105,9 +107,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: ListTile(
                               onTap: () {
                                 Product p = new Product(
+                                    product_id: product_id,
                                     product_name: product_name,
                                     product_price: product_price,
-                                    product_qty: 1.toString(),
+                                    product_qty: product_qty,
+                                    // product_qty: 1.toString(),
                                     product_url: product_url);
 
                                 setState(() {
@@ -115,15 +119,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                 });
                                 selectedList.add(p);
 // Fluttertoast.showToast(msg: 'asd');
-  /*                              Fluttertoast.showToast(
+                                Fluttertoast.showToast(
                                     msg: product_name+' : Added',
                                     toastLength: Toast.LENGTH_SHORT,
                                     // gravity: ToastGravity.CENTER,
                                     // timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.red,
-                                    textColor: Colors.blue,
+                                    // backgroundColor: Colors.red,
+                                    // textColor: Colors.blue,
                                     fontSize: 16.0
-                                );*/
+                                );
                               },
                               title: Container(
                                 // width: MediaQuery.of(context).size.width,

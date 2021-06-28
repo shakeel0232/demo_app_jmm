@@ -1,10 +1,12 @@
 class Product {
+  String product_id;
   String product_name;
   String product_price;
   String product_qty;
   String product_url;
 
   Product({
+    required this.product_id,
     required this.product_name,
     required this.product_price,
     required this.product_qty,
@@ -13,6 +15,7 @@ class Product {
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
+      product_id: json['product_id'],
       product_name: json['product_name'],
       product_price: json['product_price'],
       product_qty: json['product_qty'],
