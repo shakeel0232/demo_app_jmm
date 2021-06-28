@@ -33,6 +33,7 @@ dependencies:
   firebase_core: ^1.0.3
   accordion: ^1.0.4
   fluttertoast: ^8.0.7
+  intl: ^0.17.0
 #  multi_select_item: ^1.0.3
 
 dev_dependencies:

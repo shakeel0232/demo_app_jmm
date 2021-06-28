@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_app_jmm/constant.dart';
 import 'package:demo_app_jmm/order_history_detail.dart';
 import 'package:flutter/material.dart';
-
+import 'package:intl/intl.dart';
 double grandTotal = 0;
 
 class OrderHistory extends StatefulWidget {
@@ -31,7 +31,7 @@ class _OrderHistoryState extends State<OrderHistory> {
     );
   }
 
-  showOrdersHistory(context) {
+/*  showOrdersHistory(context) {
     return Container(
       margin: EdgeInsets.all(20),
       // height: MediaQuery.of(context).size.height,
@@ -53,9 +53,9 @@ class _OrderHistoryState extends State<OrderHistory> {
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     // physics: const NeverScrollableScrollPhysics(),
-                    /* gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    *//* gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 4,
-                    ),*/
+                    ),*//*
                     itemCount: snapshot.data!.docs.length,
                     // itemCount: snapshot.data.docs.length,
                     itemBuilder: (_, int index) {
@@ -115,7 +115,7 @@ class _OrderHistoryState extends State<OrderHistory> {
             }
           }),
     );
-  }
+  }*/
 
   showGrandTotal(context) {
     return Container(
@@ -127,7 +127,7 @@ class _OrderHistoryState extends State<OrderHistory> {
               .collection('Users')
               .doc(appConstant().userId)
               .collection('Orders')
-              // .orderBy("date", descending: false)
+              // .orderBy("date", descending: true)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -141,6 +141,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                     itemBuilder: (_, int index) {
                       var data = snapshot.data!.docs[index].data();
                       var  date = data['date'];
+
                       var grand_total = data['grand_total'].toString();
                       var order_status = data['order_status'].toString();
                       return Card(
@@ -172,9 +173,9 @@ class _OrderHistoryState extends State<OrderHistory> {
                                   ),
                                 ),                                subtitle: Container(
                                   // width: MediaQuery.of(context).size.width,
-                                  child: Text(
-                                    date.toString(),
-                                    // DateTime.fromMillisecondsSinceEpoch(date ).toString(),
+                                  child: Text(DateFormat('kk:mm - dd-MMM-yyyy').format(DateTime.parse(date.toDate().toString())),
+                                      // DateTime.parse(date.toDate().toString()).toString(),
+                                    // DateTime.fromMillisecondsSinceEpoch(date ).t oString(),
                                     style: TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,

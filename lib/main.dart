@@ -8,13 +8,13 @@ import "dart:collection";
 
 import 'package:fluttertoast/fluttertoast.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(MyApp());
 }
 
+int product_qty=0;
 double grandTotal = 0;
 List<Product> selectedList = [];
 
@@ -24,8 +24,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blueGrey
-        ,
+        primarySwatch: Colors.blueGrey,
       ),
       home: MyHomePage(),
     );
@@ -62,7 +61,14 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Container(
         child: Wrap(
           children: [
-            Center(child: Text('Products',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 30),)),
+            Center(
+                child: Text(
+              'Products',
+              style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30),
+            )),
             // Center(child: Text('Select Products',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 10),)),
             Center(child: showProducts(context)),
           ],
@@ -96,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       // print(product_id);
                       var product_name = data['product_name'].toString();
                       var product_price = data['product_price'].toString();
-                      var product_qty = data['product_qty'].toString();
+                      product_qty = data['product_qty'];
                       var product_url = data['product_url'].toString();
                       // var date = data['date'].toString();
                       return Card(
@@ -106,28 +112,26 @@ class _MyHomePageState extends State<MyHomePage> {
                             // margin: EdgeInsets.all(20),
                             child: ListTile(
                               onTap: () {
-                                Product p = new Product(
-                                    product_id: product_id,
-                                    product_name: product_name,
-                                    product_price: product_price,
-                                    product_qty: product_qty,
-                                    // product_qty: 1.toString(),
-                                    product_url: product_url);
+                                if (product_qty > 0) {
+                                  Product p = new Product(
+                                      product_id: product_id,
+                                      product_name: product_name,
+                                      product_price: product_price,
+                                      product_qty: product_qty.toString(),
+                                      // product_qty: 1.toString(),
+                                      product_url: product_url);
 
-                                setState(() {
-                                  grandTotal += double.parse(product_price);
-                                });
-                                selectedList.add(p);
-// Fluttertoast.showToast(msg: 'asd');
-                                Fluttertoast.showToast(
-                                    msg: product_name+' : Added',
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    // gravity: ToastGravity.CENTER,
-                                    // timeInSecForIosWeb: 1,
-                                    // backgroundColor: Colors.red,
-                                    // textColor: Colors.blue,
-                                    fontSize: 16.0
-                                );
+                                  setState(() {
+                                    grandTotal += double.parse(product_price);
+                                  });
+                                  selectedList.add(p);
+                                  Fluttertoast.showToast(
+                                      msg: product_name + ' : Added',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      fontSize: 16.0);
+                                } else {
+                                  Fluttertoast.showToast(msg: 'Update Qty in DB ');
+                                }
                               },
                               title: Container(
                                 // width: MediaQuery.of(context).size.width,
@@ -147,14 +151,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                     color: Colors.deepOrange),
                               ),
                               subtitle: Text(
-                                'Qty ' + product_qty,
+                                'Qty ' + product_qty.toString(),
                                 style: TextStyle(
                                     fontSize: 10,
                                     // fontWeight: FontWeight.bold,
                                     color: Colors.deepOrange),
                               ),
-                              leading: Image.network(
-                                 product_url),
+                              leading: Image.network(product_url),
                             ),
                           ));
                     }),
@@ -198,18 +201,17 @@ class _MyHomePageState extends State<MyHomePage> {
             // padding: EdgeInsets.all(10),
             child: ElevatedButton(
               onPressed: () {
-                print(selectedList);
-                selectedList= selectedList.toSet().toList();
-                print(selectedList);
-                Navigator.of(context).push(
-                  new MaterialPageRoute(
-                    builder: (c) {
-
-
-                      return new OrderConfirmation(selectedList);
-                    },
-                  ),
-                );
+                if (product_qty > 0&& selectedList.length>0) {
+                  Navigator.of(context).push(
+                    new MaterialPageRoute(
+                      builder: (c) {
+                        return new OrderConfirmation(selectedList);
+                      },
+                    ),
+                  );
+                } else {
+                  Fluttertoast.showToast(msg: 'Update Qty in DB');
+                }
               },
               child: Text('Next'),
               // style: TextStyle(fontWeight: FontWeight.bold),
