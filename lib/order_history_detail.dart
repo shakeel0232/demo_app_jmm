@@ -1,5 +1,6 @@
 import 'package:accordion/accordion.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:demo_app_jmm/constant.dart';
 import 'package:flutter/material.dart';
 
 double grandTotal = 0;
@@ -39,7 +40,7 @@ class _OrderHistoryState extends State<OrderHistoryDetail> {
       child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Users')
-              .doc('W9lxAPG5ZmPKvhAX2YLz')
+              .doc(appConstant().userId)
               .collection('Orders')
               .doc(widget.id)
               .collection('OrderProducts')
@@ -125,7 +126,7 @@ class _OrderHistoryState extends State<OrderHistoryDetail> {
       child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Users')
-              .doc('W9lxAPG5ZmPKvhAX2YLz')
+              .doc(appConstant().userId)
               .collection('Orders')
               // .orderBy("date", descending: false)
               .snapshots(),

@@ -1,5 +1,6 @@
 import 'package:accordion/accordion.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:demo_app_jmm/constant.dart';
 import 'package:demo_app_jmm/order_history_detail.dart';
 import 'package:flutter/material.dart';
 
@@ -38,7 +39,7 @@ class _OrderHistoryState extends State<OrderHistory> {
       child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Users')
-              .doc('W9lxAPG5ZmPKvhAX2YLz')
+              .doc(appConstant().userId)
               .collection('Orders')
               .doc('RkZdmOVWG5FCKxauDanA')
               .collection('OrderProducts')
@@ -124,7 +125,7 @@ class _OrderHistoryState extends State<OrderHistory> {
       child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Users')
-              .doc('W9lxAPG5ZmPKvhAX2YLz')
+              .doc(appConstant().userId)
               .collection('Orders')
               // .orderBy("date", descending: false)
               .snapshots(),
@@ -134,12 +135,12 @@ class _OrderHistoryState extends State<OrderHistory> {
                 // alignment: Alignment.center,
                 child: ListView.builder(
                     scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
+                    shrinkWrap: false,
                     itemCount: snapshot.data!.docs.length,
                     // itemCount: snapshot.data.docs.length,
                     itemBuilder: (_, int index) {
                       var data = snapshot.data!.docs[index].data();
-                      var date = data['date'];
+                      var  date = data['date'];
                       var grand_total = data['grand_total'].toString();
                       var order_status = data['order_status'].toString();
                       return Card(

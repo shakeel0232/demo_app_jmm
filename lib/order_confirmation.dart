@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:demo_app_jmm/constant.dart';
 import 'package:demo_app_jmm/object/product.dart';
 import 'package:flutter/material.dart';
 
 // var qty = 1;
-var product_qty;
+int product_qty=0;
+
 class OrderConfirmation extends StatefulWidget {
   List<Product> list;
 
@@ -21,56 +24,73 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
       body: Container(
         child: Wrap(
           children: [
-            Center(child: Text('Selected Products',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 30),)),
+            Center(
+                child: Text(
+              'Selected Products',
+              style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30),
+            )),
             // Center(child: Text('Select Products',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 10),)),
-            Center(child: ListView.builder(
-                // scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: data.length,
-                itemBuilder: (_, int index) {
-                  var product_price=data[index].product_price;
-                   product_qty=int.parse(data[index].product_qty);
-                  return Card(
-                    child: ListTile(
-                      onTap: () {
-                        setState(() {
-                          product_qty += double.parse(product_qty);
-                          // product_qty =10;
-                          // /product_qty +=  product_qty;
-                        });
-                      },
-                      title: Container(
-                        // width: MediaQuery.of(context).size.width,
-                        child: Text(
-                          data[index].product_name.toString(),
-                          style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.deepOrange),
+            Center(
+                child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: data.length,
+                    itemBuilder: (_, int index) {
+                      int product_price = int.parse(data[index].product_price);
+                      // product_qty = 1;
+                      // product_qty = int.parse(data[index].product_qty);
+                      return Card(
+                        child: ListTile(
+                          onTap: () {
+                            print(product_qty);
+                            setState(() {
+                              product_qty ++;
+                              // product_qty =10;
+                              // /product_qty +=  product_qty;
+                            });
+                            print(product_qty);
+                          },
+                          title: Container(
+                            // width: MediaQuery.of(context).size.width,
+                            child: Text(
+                              data[index].product_name.toString(),
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.deepOrange),
+                            ),
+                          ),
+                          trailing: Text(
+                            'SAR ' +
+                            (product_qty *product_price).toString(),
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepOrange),
+                          ),
+                          // title: Text(data[index].product_name.toString()),
+                          // trailing: Text('SAR : ' + data[index].product_price.toString()),
+                          subtitle: Text(
+                            product_qty.toString() +
+                                ' x ' +
+                                data[index].product_price.toString(),
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepOrange),
+                          ),
+                          leading: Image.network(
+                              data[index].product_url),
                         ),
-                      ),
-                      trailing: Text(
-                        'SAR ' + data[index].product_price.toString(),
-                        style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.deepOrange),
-                      ),
-                      // title: Text(data[index].product_name.toString()),
-                      // trailing: Text('SAR : ' + data[index].product_price.toString()),
-                      subtitle: Text(product_qty.toString() +
-                          ' x ' +
-                          data[index].product_price.toString(),            style: TextStyle(
-                          fontSize: 10,
-                          // fontWeight: FontWeight.bold,
-                          color: Colors.deepOrange),),
-                    ),
-                  );
-                })),
+                      );
+                    })),
           ],
         ),
       ),
-     /* body: ListView.builder(
+      /* body: ListView.builder(
           scrollDirection: Axis.vertical,
           shrinkWrap: true,
           itemCount: data.length,
@@ -95,6 +115,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
   }
 
   showGrandTotal(context) {
+    var docId;
     return Container(
       margin: EdgeInsets.all(10),
       padding: EdgeInsets.all(10),
@@ -123,7 +144,32 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
             // margin: EdgeInsets.all(10),
             // padding: EdgeInsets.all(10),
             child: ElevatedButton(
-              onPressed: () {},
+
+              onPressed: () async {
+               await  FirebaseFirestore.instance
+                    .collection('Users')
+                    .doc(appConstant().userId)
+                    .collection('Orders')
+                    .add({
+                  'grand_total': 1200,
+                  'order_status': 'pending',
+                  'date': FieldValue.serverTimestamp()
+                }).then((value) => docId =value.id);
+                
+               for(int i=0;i<widget.list.length;i++){
+                 FirebaseFirestore.instance
+                     .collection('Users')
+                     .doc(appConstant().userId)
+                     .collection('Orders').doc(docId).collection('OrderProducts')
+                     .add({
+                   'product_name': widget.list[i].product_name,
+                   'product_price': widget.list[i]. product_price,
+                   'product_qty': widget.list[i].product_qty,
+                   'product_url': widget.list[i].product_url
+                 });
+               }
+
+              },
               child: Text('Place Order'),
               // style: TextStyle(fontWeight: FontWeight.bold),
             ),

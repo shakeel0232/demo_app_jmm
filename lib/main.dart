@@ -6,6 +6,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import "dart:collection";
 
+import 'package:fluttertoast/fluttertoast.dart';
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -84,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
               return Container(
                 child: ListView.builder(
                     scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
+                    shrinkWrap: false,
                     itemCount: snapshot.data!.docs.length,
                     // itemCount: snapshot.data.docs.length,
                     itemBuilder: (_, int index) {
@@ -106,17 +109,21 @@ class _MyHomePageState extends State<MyHomePage> {
                                     product_price: product_price,
                                     product_qty: 1.toString(),
                                     product_url: product_url);
-                                // print(selectedList.contains(p));
-                                // List<Product> result =
-                                //     LinkedHashSet<Product>.from(selectedList)
-                                //         .toList();
-                                // print(result);
-                                if (!selectedList.contains(p)) {
-                                  selectedList.add(p);
-                                  setState(() {
-                                    grandTotal += double.parse(product_price);
-                                  });
-                                }
+
+                                setState(() {
+                                  grandTotal += double.parse(product_price);
+                                });
+                                selectedList.add(p);
+Fluttertoast.showToast(msg: 'asd');
+  /*                              Fluttertoast.showToast(
+                                    msg: product_name+' : Added',
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    // gravity: ToastGravity.CENTER,
+                                    // timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.blue,
+                                    fontSize: 16.0
+                                );*/
                               },
                               title: Container(
                                 // width: MediaQuery.of(context).size.width,
@@ -143,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     color: Colors.deepOrange),
                               ),
                               leading: Image.network(
-                                  'https://cdn.shopify.com/s/files/1/2219/4035/products/9_0092150e-49ed-4355-af8d-a9a3abf741e5_1024x1024.jpg?v=1502164799'),
+                                 product_url),
                             ),
                           ));
                     }),
