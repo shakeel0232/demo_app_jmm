@@ -5,8 +5,12 @@ import 'package:demo_app_jmm/order_history.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-var grandTotal = 0;
-int product_qty = 1;
+var grandTotal=0;
+
+int product_qty = 0;
+int product_qty2 = 1;
+List<int> listGT = [];
+List<int> listPQ = [];
 
 class OrderConfirmation extends StatefulWidget {
   List<Product> list;
@@ -22,6 +26,14 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    for (int z = 0; z < widget.list.length; z++) {
+      listGT.add(int.parse(widget.list[z].product_price) *
+          int.parse(widget.list[z].product_qty2));
+    }
+    for (var i = 0; i < listGT.length; i++) {
+      listPQ.add(int.parse(widget.list[i].product_qty2));
+      grandTotal += listGT[i];
+    }
   }
 
   @override
@@ -35,12 +47,12 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
           children: [
             Center(
                 child: Text(
-                  'Selected Products',
-                  style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30),
-                )),
+              'Selected Products',
+              style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30),
+            )),
             // Center(child: Text('Select Products',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 10),)),
             Center(
                 child: ListView.builder(
@@ -49,26 +61,26 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                     itemCount: data.length,
                     itemBuilder: (_, int index) {
                       int product_price = int.parse(data[index].product_price);
-                      // grandTotal= product_qty *product_price;
-                      // product_qty = 1;
-                      // product_qty = int.parse(data[index].product_qty);
                       return Card(
                         child: ListTile(
                           onTap: () {
-                            // print(product_qty);
-                            setState(() {
-                              // product_qty=product_price;
-                              product_qty ++;
-                              // grandTotal= product_qty *product_price;
-                              // grandTotal+=grandTotal;
-                            });
+                            listPQ.add(int.parse(widget.list[index].product_qty2));
 
-                            // print(grandTotal);
+                            setState(() {
+                              // product_qty=int.parse( widget.list[index].product_qty2);
+                              // product_q/ty++;
+                              // product_qty=
+                              listPQ[index]++;
+                              // grandTotal = product_price * int.parse( widget.list[index].product_qty2);
+                              grandTotal += (product_price *
+                                  int.parse(widget.list[index].product_qty2));
+                            });
                           },
                           title: Container(
                             // width: MediaQuery.of(context).size.width,
                             child: Text(
-                              data[index].product_name.toString() + ' : ' +
+                              data[index].product_name.toString() +
+                                  ' : ' +
                                   (data[index].product_id.toString()),
                               style: TextStyle(
                                   fontSize: 10,
@@ -77,8 +89,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                             ),
                           ),
                           trailing: Text(
-                            'SAR ' +
-                                (product_qty * product_price).toString(),
+                            'SAR ' + (listPQ[index] * product_price).toString(),
                             style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
@@ -87,7 +98,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                           // title: Text(data[index].product_name.toString()),
                           // trailing: Text('SAR : ' + data[index].product_price.toString()),
                           subtitle: Text(
-                            product_qty.toString() +
+                            listPQ[index].toString() +
                                 ' x ' +
                                 data[index].product_price.toString(),
                             style: TextStyle(
@@ -95,8 +106,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                                 fontWeight: FontWeight.bold,
                                 color: Colors.deepOrange),
                           ),
-                          leading: Image.network(
-                              data[index].product_url),
+                          leading: Image.network(data[index].product_url),
                         ),
                       );
                     })),
@@ -137,10 +147,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
           Container(
             color: Colors.redAccent,
             height: 1,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
           ),
           Container(
             margin: EdgeInsets.all(10),
@@ -153,17 +160,13 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
           Container(
             color: Colors.redAccent,
             height: 1,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
           ),
           Container(
             alignment: Alignment.centerRight,
             // margin: EdgeInsets.all(10),
             // padding: EdgeInsets.all(10),
             child: ElevatedButton(
-
               onPressed: () async {
                 await FirebaseFirestore.instance
                     .collection('Users')
@@ -185,21 +188,22 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
     );
   }
 
-
   addOrderItems(docId) async {
     for (int i = 0; i < widget.list.length; i++) {
       await FirebaseFirestore.instance
           .collection('Users')
           .doc(appConstant().userId)
-          .collection('Orders').doc(docId).collection('OrderProducts')
+          .collection('Orders')
+          .doc(docId)
+          .collection('OrderProducts')
           .add({
         'product_name': widget.list[i].product_name,
         'product_price': widget.list[i].product_price,
-        'product_qty': widget.list[i].product_qty,
+        'product_qty': widget.list[i].product_qty2,
         'product_url': widget.list[i].product_url
       });
-      deductQty(widget.list[i].product_id);
-    widget.list.clear();
+      deductQty(widget.list[i].product_id,listPQ[i]);
+      widget.list.clear();
       Navigator.of(context).push(
         new MaterialPageRoute(
           builder: (c) {
@@ -210,11 +214,11 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
     }
   }
 
-  deductQty(docId) {
+  deductQty(docId,value) {
     FirebaseFirestore.instance
         .collection('Products')
         .doc(docId)
-        .update({'product_qty': FieldValue.increment(-product_qty)}).then((
-        value) => Fluttertoast.showToast(msg: 'Successfully Place Order'));
+        .update({'product_qty': FieldValue.increment(-value)}).then(
+            (value) => Fluttertoast.showToast(msg: 'Successfully Place Order'));
   }
 }

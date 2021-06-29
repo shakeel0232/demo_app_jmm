@@ -46,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: selectedList.length>0?FloatingActionButton(
         child: Icon(Icons.list),
         onPressed: () {
           Navigator.of(context).push(
@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           );
         },
-      ),
+      ):Container(),
       body: Container(
         child: Wrap(
           children: [
@@ -75,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       bottomNavigationBar: showGrandTotal(context),
+      // bottomNavigationBar: selectedList.length>0?showGrandTotal(context):Container(),
     );
   }
 
@@ -118,6 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       product_name: product_name,
                                       product_price: product_price,
                                       product_qty: product_qty.toString(),
+                                      product_qty2: '1',
                                       // product_qty: 1.toString(),
                                       product_url: product_url);
 
