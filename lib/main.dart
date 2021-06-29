@@ -17,6 +17,7 @@ void main() async {
 int product_qty=0;
 double grandTotal = 0;
 List<Product> selectedList = [];
+Set mySet= new Set();
 
 class MyApp extends StatelessWidget {
   @override
@@ -46,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      floatingActionButton: selectedList.length>0?FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
         child: Icon(Icons.list),
         onPressed: () {
           Navigator.of(context).push(
@@ -57,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           );
         },
-      ):Container(),
+      ),
       body: Container(
         child: Wrap(
           children: [
@@ -68,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: Colors.blue,
                   fontWeight: FontWeight.bold,
                   fontSize: 30),
-            )),
+            ),),
             // Center(child: Text('Select Products',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 10),)),
             Center(child: showProducts(context)),
           ],
@@ -113,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             // margin: EdgeInsets.all(20),
                             child: ListTile(
                               onTap: () {
-                                if (product_qty > 0) {
+                                // if (product_qty > 0) {
                                   Product p = new Product(
                                       product_id: product_id,
                                       product_name: product_name,
@@ -126,14 +127,22 @@ class _MyHomePageState extends State<MyHomePage> {
                                   setState(() {
                                     grandTotal += double.parse(product_price);
                                   });
-                                  selectedList.add(p);
-                                  Fluttertoast.showToast(
-                                      msg: product_name + ' : Added',
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      fontSize: 16.0);
-                                } else {
-                                  Fluttertoast.showToast(msg: 'Update Qty in DB ');
-                                }
+                                  for(int j=0;j<selectedList.length;j++){
+                                    if(selectedList[j].product_name.trim().contains(p.product_name.trim())){
+
+                                      print('not Added');
+                                    }else{
+                                      selectedList.add(p);
+                                      Fluttertoast.showToast(
+                                          msg: product_name + ' : Added',
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          fontSize: 16.0);
+
+                                    }
+                                  }
+
+
+
                               },
                               title: Container(
                                 // width: MediaQuery.of(context).size.width,
@@ -188,7 +197,7 @@ class _MyHomePageState extends State<MyHomePage> {
             margin: EdgeInsets.all(10),
             // padding: EdgeInsets.all(10),
             child: Text(
-              'Grand Total : SAR. ' + grandTotal.toString(),
+              'Total : SAR. ' + grandTotal.toString(),
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -199,21 +208,24 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Container(
             alignment: Alignment.centerRight,
-            // margin: EdgeInsets.all(10),
-            // padding: EdgeInsets.all(10),
             child: ElevatedButton(
               onPressed: () {
-                if (product_qty > 0&& selectedList.length>0) {
+                if(grandTotal>0&& selectedList.length>0){
                   Navigator.of(context).push(
                     new MaterialPageRoute(
                       builder: (c) {
                         return new OrderConfirmation(selectedList);
                       },
                     ),
+
                   );
-                } else {
-                  Fluttertoast.showToast(msg: 'Update Qty in DB');
+                  setState(() {
+                    grandTotal=0;
+                  });
+                }else{
+                  Fluttertoast.showToast(msg: 'Please add items');
                 }
+
               },
               child: Text('Next'),
               // style: TextStyle(fontWeight: FontWeight.bold),

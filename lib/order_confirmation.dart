@@ -6,13 +6,13 @@ import 'package:demo_app_jmm/order_history.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-var grandTotal=0;
+var grandTotal = 0;
 
 int product_qty = 0;
 int product_qty2 = 1;
 List<int> listGT = [];
 List<int> listPQ = [];
-
+bool _progressBarActiv=false;
 class OrderConfirmation extends StatefulWidget {
   List<Product> list;
 
@@ -65,7 +65,8 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                       return Card(
                         child: ListTile(
                           onTap: () {
-                            listPQ.add(int.parse(widget.list[index].product_qty2));
+                            listPQ.add(
+                                int.parse(widget.list[index].product_qty2));
 
                             setState(() {
                               listPQ[index]++;
@@ -77,7 +78,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                             // width: MediaQuery.of(context).size.width,
                             child: Text(
                               data[index].product_name.toString(),
-                         /*         +
+                              /*         +
                                   ' : ' +
                                   (data[index].product_id.toString()
                                   ),*/
@@ -167,17 +168,20 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
             // padding: EdgeInsets.all(10),
             child: ElevatedButton(
               onPressed: () async {
-                await FirebaseFirestore.instance
-                    .collection('Users')
-                    .doc(appConstant().userId)
-                    .collection('Orders')
-                    .add({
-                  'grand_total': grandTotal,
-                  'order_status': 'pending',
-                  'date': FieldValue.serverTimestamp()
-                }).then((value) => docId = value.id);
-
-                addOrderItems(docId);
+                if (grandTotal > 0 && widget.list.length > 0) {
+                  await FirebaseFirestore.instance
+                      .collection('Users')
+                      .doc(appConstant().userId)
+                      .collection('Orders')
+                      .add({
+                    'grand_total': grandTotal,
+                    'order_status': 'pending',
+                    'date': FieldValue.serverTimestamp()
+                  }).then((value) => docId = value.id);
+                  addOrderItems(docId);
+                } else {
+                  Fluttertoast.showToast(msg: 'Please add items');
+                }
               },
               child: Text('Place Order'),
             ),
@@ -188,7 +192,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
   }
 
   addOrderItems(docId) async {
-    print('len:001: '+widget.list.length.toString());
+    print('len:001: ' + widget.list.length.toString());
     for (int i = 0; i < widget.list.length; i++) {
       await FirebaseFirestore.instance
           .collection('Users')
@@ -202,9 +206,17 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
         'product_qty': listPQ[i],
         'product_url': widget.list[i].product_url
       });
-      deductQty(widget.list[i].product_id,listPQ[i]);
+      deductQty(widget.list[i].product_id, listPQ[i]);
     }
-    widget.list.clear();
+    setState(() {
+      widget.list.clear();
+      grandTotal = 0;
+      product_qty = 0;
+      product_qty2 = 0;
+      listGT.clear();
+      listPQ.clear();
+    });
+
     Navigator.of(context).pushReplacement(
       new MaterialPageRoute(
         builder: (c) {
@@ -214,11 +226,11 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
     );
   }
 
-  deductQty(docId,value) {
+  deductQty(docId, value) {
     FirebaseFirestore.instance
         .collection('Products')
         .doc(docId)
         .update({'product_qty': FieldValue.increment(-value)}).then(
-            (value) => Fluttertoast.showToast(msg: 'Successfully Place Order'));
+            (value) =>Fluttertoast.showToast(msg: 'Successfully Place Order'));
   }
 }
