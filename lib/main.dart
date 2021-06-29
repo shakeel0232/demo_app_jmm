@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_app_jmm/object/product.dart';
-import 'package:demo_app_jmm/order_confirmation.dart';
-import 'package:demo_app_jmm/order_history.dart';
+import 'package:demo_app_jmm/order_history/order_history.dart';
+import 'package:demo_app_jmm/place_order/order_confirmation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import "dart:collection";
-
 import 'package:fluttertoast/fluttertoast.dart';
 
 void main() async {
@@ -14,10 +12,10 @@ void main() async {
   runApp(MyApp());
 }
 
-int product_qty=0;
+int product_qty = 0;
+int product_selected_qty = 1;
 double grandTotal = 0;
 List<Product> selectedList = [];
-Set mySet= new Set();
 
 class MyApp extends StatelessWidget {
   @override
@@ -42,11 +40,16 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(
+          'Products',
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.list),
         onPressed: () {
@@ -59,24 +62,8 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
       ),
-      body: Container(
-        child: Wrap(
-          children: [
-            Center(
-                child: Text(
-              'Products',
-              style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30),
-            ),),
-            // Center(child: Text('Select Products',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 10),)),
-            Center(child: showProducts(context)),
-          ],
-        ),
-      ),
+      body: showProducts(context),
       bottomNavigationBar: showGrandTotal(context),
-      // bottomNavigationBar: selectedList.length>0?showGrandTotal(context):Container(),
     );
   }
 
@@ -97,55 +84,37 @@ class _MyHomePageState extends State<MyHomePage> {
                     scrollDirection: Axis.vertical,
                     shrinkWrap: false,
                     itemCount: snapshot.data!.docs.length,
-                    // itemCount: snapshot.data.docs.length,
                     itemBuilder: (_, int index) {
                       var data = snapshot.data!.docs[index].data();
                       var product_id = snapshot.data!.docs[index].id;
-                      // print(product_id);
                       var product_name = data['product_name'].toString();
                       var product_price = data['product_price'].toString();
                       product_qty = data['product_qty'];
                       var product_url = data['product_url'].toString();
-                      // var date = data['date'].toString();
                       return Card(
                           shadowColor: Colors.red,
                           child: Container(
                             width: MediaQuery.of(context).size.width,
-                            // margin: EdgeInsets.all(20),
                             child: ListTile(
                               onTap: () {
-                                // if (product_qty > 0) {
-                                  Product p = new Product(
-                                      product_id: product_id,
-                                      product_name: product_name,
-                                      product_price: product_price,
-                                      product_qty: product_qty.toString(),
-                                      product_qty2: '1',
-                                      // product_qty: 1.toString(),
-                                      product_url: product_url);
+                                Product p = new Product(
+                                    product_id: product_id,
+                                    product_name: product_name,
+                                    product_price: product_price,
+                                    product_qty: product_qty.toString(),
+                                    product_selected_qty: product_selected_qty.toString(),
+                                    product_url: product_url);
 
-                                  setState(() {
-                                    grandTotal += double.parse(product_price);
-                                  });
-                                  for(int j=0;j<selectedList.length;j++){
-                                    if(selectedList[j].product_name.trim().contains(p.product_name.trim())){
-
-                                      print('not Added');
-                                    }else{
-                                      selectedList.add(p);
-                                      Fluttertoast.showToast(
-                                          msg: product_name + ' : Added',
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          fontSize: 16.0);
-
-                                    }
-                                  }
-
-
-
+                                setState(() {
+                                  grandTotal += double.parse(product_price);
+                                });
+                                selectedList.add(p);
+                                Fluttertoast.showToast(
+                                    msg: product_name + ' : Added',
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    fontSize: 16.0);
                               },
                               title: Container(
-                                // width: MediaQuery.of(context).size.width,
                                 child: Text(
                                   product_name,
                                   style: TextStyle(
@@ -165,7 +134,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                 'Qty ' + product_qty.toString(),
                                 style: TextStyle(
                                     fontSize: 10,
-                                    // fontWeight: FontWeight.bold,
                                     color: Colors.deepOrange),
                               ),
                               leading: Image.network(product_url),
@@ -195,7 +163,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Container(
             margin: EdgeInsets.all(10),
-            // padding: EdgeInsets.all(10),
             child: Text(
               'Total : SAR. ' + grandTotal.toString(),
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -210,25 +177,22 @@ class _MyHomePageState extends State<MyHomePage> {
             alignment: Alignment.centerRight,
             child: ElevatedButton(
               onPressed: () {
-                if(grandTotal>0&& selectedList.length>0){
+                if (grandTotal > 0 && selectedList.length > 0) {
                   Navigator.of(context).push(
                     new MaterialPageRoute(
                       builder: (c) {
                         return new OrderConfirmation(selectedList);
                       },
                     ),
-
                   );
                   setState(() {
-                    grandTotal=0;
+                    grandTotal = 0;
                   });
-                }else{
+                } else {
                   Fluttertoast.showToast(msg: 'Please add items');
                 }
-
               },
               child: Text('Next'),
-              // style: TextStyle(fontWeight: FontWeight.bold),
             ),
           )
         ],
