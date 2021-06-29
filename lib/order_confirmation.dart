@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_app_jmm/constant.dart';
+import 'package:demo_app_jmm/main.dart';
 import 'package:demo_app_jmm/object/product.dart';
 import 'package:demo_app_jmm/order_history.dart';
 import 'package:flutter/material.dart';
@@ -67,11 +68,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                             listPQ.add(int.parse(widget.list[index].product_qty2));
 
                             setState(() {
-                              // product_qty=int.parse( widget.list[index].product_qty2);
-                              // product_q/ty++;
-                              // product_qty=
                               listPQ[index]++;
-                              // grandTotal = product_price * int.parse( widget.list[index].product_qty2);
                               grandTotal += (product_price *
                                   int.parse(widget.list[index].product_qty2));
                             });
@@ -79,9 +76,11 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
                           title: Container(
                             // width: MediaQuery.of(context).size.width,
                             child: Text(
-                              data[index].product_name.toString() +
+                              data[index].product_name.toString(),
+                         /*         +
                                   ' : ' +
-                                  (data[index].product_id.toString()),
+                                  (data[index].product_id.toString()
+                                  ),*/
                               style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -189,6 +188,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
   }
 
   addOrderItems(docId) async {
+    print('len:001: '+widget.list.length.toString());
     for (int i = 0; i < widget.list.length; i++) {
       await FirebaseFirestore.instance
           .collection('Users')
@@ -199,19 +199,19 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
           .add({
         'product_name': widget.list[i].product_name,
         'product_price': widget.list[i].product_price,
-        'product_qty': widget.list[i].product_qty2,
+        'product_qty': listPQ[i],
         'product_url': widget.list[i].product_url
       });
       deductQty(widget.list[i].product_id,listPQ[i]);
-      widget.list.clear();
-      Navigator.of(context).push(
-        new MaterialPageRoute(
-          builder: (c) {
-            return new OrderHistory();
-          },
-        ),
-      );
     }
+    widget.list.clear();
+    Navigator.of(context).pushReplacement(
+      new MaterialPageRoute(
+        builder: (c) {
+          return new MyApp();
+        },
+      ),
+    );
   }
 
   deductQty(docId,value) {

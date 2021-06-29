@@ -127,7 +127,7 @@ class _OrderHistoryState extends State<OrderHistory> {
               .collection('Users')
               .doc(appConstant().userId)
               .collection('Orders')
-              // .orderBy("date", descending: true)
+              .orderBy("date", descending: true)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
